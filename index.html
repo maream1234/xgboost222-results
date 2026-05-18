@@ -2,16 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interactive Dataset Analysis Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cybersecurity Dataset Dashboard</title>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
       background: #0f172a;
       color: white;
-      margin: 0;
-      padding: 0;
     }
 
     .container {
@@ -27,36 +28,55 @@
     }
 
     .header h1 {
-      font-size: 42px;
+      font-size: 40px;
       margin-bottom: 10px;
     }
 
     .header p {
       color: #cbd5e1;
-      font-size: 18px;
     }
 
-    .controls {
+    .top-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .card {
       background: #1e293b;
       padding: 25px;
-      border-radius: 20px;
-      margin-bottom: 30px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      align-items: center;
-      justify-content: center;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
-    select, button {
-      padding: 12px 18px;
+    .card h3 {
+      color: #60a5fa;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .section {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 20px;
+      margin-bottom: 40px;
+    }
+
+    select,
+    textarea,
+    button {
+      width: 100%;
+      padding: 15px;
       border-radius: 10px;
       border: none;
+      margin-top: 15px;
       font-size: 16px;
-    }
-
-    select {
-      width: 300px;
     }
 
     button {
@@ -70,126 +90,96 @@
       background: #1d4ed8;
     }
 
-    .analysis-box {
-      background: #1e293b;
-      border-radius: 20px;
-      padding: 30px;
-      margin-bottom: 30px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-
-    .analysis-box h2 {
-      margin-bottom: 20px;
-      color: #60a5fa;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
-    }
-
-    .card {
-      background: #334155;
-      padding: 20px;
-      border-radius: 15px;
-      text-align: center;
-    }
-
-    .card h3 {
-      margin-bottom: 10px;
-      color: #93c5fd;
-    }
-
-    .card p {
-      font-size: 22px;
-      font-weight: bold;
-    }
-
     canvas {
       background: white;
       border-radius: 15px;
       padding: 15px;
-      margin-top: 20px;
+      margin-top: 25px;
+    }
+
+    .prediction-results {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 25px;
     }
 
     footer {
       text-align: center;
-      padding: 20px;
       color: #94a3b8;
       margin-top: 40px;
+      padding-bottom: 30px;
     }
   </style>
 </head>
+
 <body>
 
 <div class="container">
 
   <div class="header">
-    <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:25px;">
-      <div class="card" style="min-width:180px;">
-        <h3>Total Records</h3>
-        <p>9980</p>
-      </div>
-      <div class="card" style="min-width:180px;">
-        <h3>Total Features</h3>
-        <p>23</p>
-      </div>
-      <div class="card" style="min-width:180px;">
-        <h3>Best Model</h3>
-        <p>XGBoost</p>
-      </div>
-    </div>
-    <h1>Interactive Cybersecurity Dataset Analysis</h1>
-    <p>Select any feature from the dataset and explore its analysis interactively.</p>
+    <h1>Cybersecurity Dataset Analysis Dashboard</h1>
+    <p>Interactive AI-Based Feature Analysis System</p>
   </div>
 
-  <div class="controls">
+  <div class="top-cards">
+
+    <div class="card">
+      <h3>Total Records</h3>
+      <p>9980</p>
+    </div>
+
+    <div class="card">
+      <h3>Total Features</h3>
+      <p>23</p>
+    </div>
+
+    <div class="card">
+      <h3>Best Model</h3>
+      <p>XGBoost</p>
+    </div>
+
+  </div>
+
+  <div class="section">
+
+    <h2>Select Feature to Analyze</h2>
+
     <select id="featureSelect">
       <option value="Threat_Domain">Threat Domain</option>
       <option value="Intent_Label">Intent Label</option>
-      <option value="Model_Type">Model Type</option>
       <option value="Language">Language</option>
+      <option value="Model_Type">Model Type</option>
       <option value="Response_Complexity">Response Complexity</option>
       <option value="Ethical_Compliance">Ethical Compliance</option>
     </select>
 
-    <button onclick="analyzeFeature()">Analyze Feature</button>
-  </div>
+    <button onclick="analyzeFeature()">
+      Analyze Feature
+    </button>
 
-  <div class="analysis-box">
-    <h2 id="analysisTitle">Feature Analysis</h2>
+    <canvas id="barChart"></canvas>
 
-    <div class="cards">
-      <div class="card">
-        <h3>Total Records</h3>
-        <p>9980</p>
-      </div>
-
-      <div class="card">
-        <h3>Most Common Value</h3>
-        <p id="topValue">-</p>
-      </div>
-
-      <div class="card">
-        <h3>Unique Categories</h3>
-        <p id="uniqueCount">-</p>
-      </div>
-    </div>
-
-    <canvas id="featureChart"></canvas>
     <canvas id="pieChart"></canvas>
+
   </div>
 
-  <div class="analysis-box">
+  <div class="section">
+
     <h2>AI Prediction Section</h2>
 
-    <textarea id="userPrompt" rows="5" placeholder="Enter a cybersecurity prompt here..." style="width:100%;padding:15px;border-radius:15px;border:none;font-size:16px;"></textarea>
+    <textarea
+      id="userPrompt"
+      rows="5"
+      placeholder="Enter a cybersecurity prompt..."
+    ></textarea>
 
-    <button onclick="predictIntent()" style="margin-top:20px;">Predict Intent</button>
+    <button onclick="predictIntent()">
+      Predict Intent
+    </button>
 
-    <div class="cards">
+    <div class="prediction-results">
+
       <div class="card">
         <h3>Predicted Intent</h3>
         <p id="predictedIntent">-</p>
@@ -199,12 +189,19 @@
         <h3>Risk Level</h3>
         <p id="riskLevel">-</p>
       </div>
+
     </div>
+
   </div>
 
-  <div class="analysis-box">
-    <h2>Download Results</h2>
-    <button onclick="downloadReport()">Download Analysis Report</button>
+  <div class="section">
+
+    <h2>Download Analysis Report</h2>
+
+    <button onclick="downloadReport()">
+      Download Report
+    </button>
+
   </div>
 
   <footer>
@@ -214,136 +211,187 @@
 </div>
 
 <script>
-  const featureData = {
-    Threat_Domain: {
-      labels: ['Cryptography', 'Social Engineering', 'IoT Security', 'Network Security'],
-      values: [3200, 2700, 2100, 1980],
-      top: 'Cryptography'
-    },
-    Intent_Label: {
-      labels: ['Educational', 'Defensive Query', 'Analytical', 'Malicious'],
-      values: [4200, 2800, 2100, 880],
-      top: 'Educational'
-    },
-    Model_Type: {
-      labels: ['XGBoost', 'Random Forest', 'Logistic Regression'],
-      values: [3400, 3300, 3280],
-      top: 'XGBoost'
-    },
-    Language: {
-      labels: ['English', 'Arabic'],
-      values: [7200, 2780],
-      top: 'English'
-    },
-    Response_Complexity: {
-      labels: ['Low', 'Medium', 'High'],
-      values: [2200, 4800, 2980],
-      top: 'Medium'
-    },
-    Ethical_Compliance: {
-      labels: ['Compliant', 'Non-Compliant'],
-      values: [9970, 10],
-      top: 'Compliant'
-    }
-  };
 
-  let barChart;
-  let pieChart;
+const featureData = {
 
-  function analyzeFeature() {
-    const feature = document.getElementById('featureSelect').value;
-    const data = featureData[feature];
+  Threat_Domain: {
+    labels: ['Cryptography', 'Social Engineering', 'IoT Security', 'Network Security'],
+    values: [3200, 2700, 2100, 1980]
+  },
 
-    document.getElementById('analysisTitle').innerText = feature + ' Analysis';
-    document.getElementById('topValue').innerText = data.top;
-    document.getElementById('uniqueCount').innerText = data.labels.length;
+  Intent_Label: {
+    labels: ['Educational', 'Defensive Query', 'Analytical', 'Malicious'],
+    values: [4200, 2800, 2100, 880]
+  },
 
-    if (barChart) {
-      barChart.destroy();
-    }
+  Language: {
+    labels: ['English', 'Arabic'],
+    values: [7200, 2780]
+  },
 
-    if (pieChart) {
-      pieChart.destroy();
-    }
+  Model_Type: {
+    labels: ['XGBoost', 'Random Forest', 'Logistic Regression'],
+    values: [3400, 3300, 3280]
+  },
 
-    const barCtx = document.getElementById('featureChart').getContext('2d');
+  Response_Complexity: {
+    labels: ['Low', 'Medium', 'High'],
+    values: [2200, 4800, 2980]
+  },
 
-    barChart = new Chart(barCtx, {
-      type: 'bar',
-      data: {
-        labels: data.labels,
-        datasets: [{
-          label: feature,
-          data: data.values,
-          backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
-          borderRadius: 8
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
-
-    const pieCtx = document.getElementById('pieChart').getContext('2d');
-
-    pieChart = new Chart(pieCtx, {
-      type: 'pie',
-      data: {
-        labels: data.labels,
-        datasets: [{
-          data: data.values,
-          backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444']
-        }]
-      },
-      options: {
-        responsive: true
-      }
-    });
+  Ethical_Compliance: {
+    labels: ['Compliant', 'Non-Compliant'],
+    values: [9970, 10]
   }
 
-  function predictIntent() {
-    const text = document.getElementById('userPrompt').value.toLowerCase();
+};
 
-    let intent = 'Educational';
-    let risk = 'Low';
+let barChart;
+let pieChart;
 
-    if (text.includes('hack') || text.includes('attack') || text.includes('bypass')) {
-      intent = 'Malicious';
-      risk = 'High';
-    } else if (text.includes('security') || text.includes('defense')) {
-      intent = 'Defensive Query';
-      risk = 'Medium';
-    } else if (text.includes('analysis')) {
-      intent = 'Analytical';
-      risk = 'Medium';
-    }
+function analyzeFeature() {
 
-    document.getElementById('predictedIntent').innerText = intent;
-    document.getElementById('riskLevel').innerText = risk;
+  const feature =
+    document.getElementById("featureSelect").value;
+
+  const data = featureData[feature];
+
+  if (barChart) {
+    barChart.destroy();
   }
 
-  function downloadReport() {
-    const content = 'Cybersecurity Dataset Analysis
+  if (pieChart) {
+    pieChart.destroy();
+  }
+
+  const barCtx =
+    document.getElementById("barChart");
+
+  barChart = new Chart(barCtx, {
+
+    type: 'bar',
+
+    data: {
+
+      labels: data.labels,
+
+      datasets: [{
+        label: feature,
+        data: data.values,
+        backgroundColor: [
+          '#3b82f6',
+          '#10b981',
+          '#f59e0b',
+          '#ef4444'
+        ]
+      }]
+    }
+
+  });
+
+  const pieCtx =
+    document.getElementById("pieChart");
+
+  pieChart = new Chart(pieCtx, {
+
+    type: 'pie',
+
+    data: {
+
+      labels: data.labels,
+
+      datasets: [{
+        data: data.values,
+        backgroundColor: [
+          '#3b82f6',
+          '#10b981',
+          '#f59e0b',
+          '#ef4444'
+        ]
+      }]
+    }
+
+  });
+
+}
+
+function predictIntent() {
+
+  const text =
+    document.getElementById("userPrompt")
+    .value
+    .toLowerCase();
+
+  let intent = "Educational";
+  let risk = "Low";
+
+  if (
+    text.includes("hack") ||
+    text.includes("attack") ||
+    text.includes("bypass")
+  ) {
+
+    intent = "Malicious";
+    risk = "High";
+
+  }
+
+  else if (
+    text.includes("security") ||
+    text.includes("defense")
+  ) {
+
+    intent = "Defensive Query";
+    risk = "Medium";
+
+  }
+
+  else if (
+    text.includes("analysis")
+  ) {
+
+    intent = "Analytical";
+    risk = "Medium";
+
+  }
+
+  document.getElementById("predictedIntent")
+    .innerText = intent;
+
+  document.getElementById("riskLevel")
+    .innerText = risk;
+
+}
+
+function downloadReport() {
+
+  const content =
+`Cybersecurity Dataset Analysis
 
 Best Model: XGBoost
 Accuracy: 0.8998
 Precision: 0.8954
 Recall: 0.8998
-F1-Score: 0.8924';
+F1-Score: 0.8924`;
 
-    const blob = new Blob([content], { type: 'text/plain' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'analysis_report.txt';
-    link.click();
-  }
+  const blob =
+    new Blob([content], { type: 'text/plain' });
 
-  analyzeFeature();
+  const link =
+    document.createElement("a");
+
+  link.href =
+    URL.createObjectURL(blob);
+
+  link.download =
+    "analysis_report.txt";
+
+  link.click();
+
+}
+
+analyzeFeature();
+
 </script>
 
 </body>
